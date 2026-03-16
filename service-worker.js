@@ -1,4 +1,4 @@
-const CACHE_NAME="plywood-quote-plus05"
+const CACHE_NAME="plywood-quote-plus0"
 
 const urls=[
 
