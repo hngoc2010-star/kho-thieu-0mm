@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>Quote Thiếu Khổ +0mm</title>
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<style>
+
+body{
+font-family:-apple-system,BlinkMacSystemFont,Arial;
+background:#f2f2f2;
+margin:0;
+display:flex;
+justify-content:center;
+padding:10px;
+}
+
+.app{
+width:100%;
+max-width:360px;
+background:white;
+padding:14px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,.12);
+}
+
+h3{
+text-align:center;
+margin:0 0 6px 0;
+font-size:17px;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:4px;
+font-size:14px;
+}
+
+.row input{
+width:90px;
+padding:4px;
+font-size:16px;
+border:1px solid #ccc;
+border-radius:4px;
+text-align:right;
+}
+
+.result{
+margin-top:8px;
+font-size:14px;
+font-weight:600;
+}
+
+.result div{
+display:flex;
+justify-content:space-between;
+margin:2px 0;
+}
+
+.blue{color:#2563eb;}
+.red{color:#dc2626;}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+<h3>Quote Thiếu Khổ +0mm</h3>
+
+<div class="row">Thickness(mm)<input id="thickness"></div>
+
+<div class="row">Width(mm)<input id="width"></div>
+<div class="row">Length(mm)<input id="length"></div>
+
+<div class="row">Bundles<input id="bundle"></div>
+<div class="row">Pcs/Bundle<input id="pcsBundle"></div>
+
+<div class="row">USD Rate<input id="usd"></div>
+
+<div class="row">EXW (VND/pcs)<input id="exwpcs"></div>
+<div class="row">EXW (VND/cbm)<input id="exwcbm"></div>
+
+<div class="row">Logistics<input id="logistics"></div>
+<div class="row">CFR price(USD)<input id="cfr"></div>
+
+<div class="result">
+
+<div>Total PCS <span id="pcs">0</span></div>
+
+<div>CBM Buy <span id="buy">0</span></div>
+
+<div>CBM Sell <span id="sell">0</span></div>
+
+<div>CBM Diff <span id="diff">0</span></div>
+
+<div>Profit/Container <span id="profit">0</span></div>
+
+</div>
+
+</div>
+
+<script>
+
+document.querySelectorAll("input").forEach(i=>{
+
+i.addEventListener("input",calc)
+i.addEventListener("blur",formatInput)
+
+})
+
+function number(id){
+
+return parseFloat(
+document.getElementById(id).value.replace(/,/g,'')
+)||0
+
+}
+
+function format(x){
+
+return Number(x).toLocaleString("en-US",{maximumFractionDigits:2})
+
+}
+
+function formatInput(e){
+
+let v=e.target.value.replace(/,/g,'')
+
+if(v!==""){
+
+e.target.value=Number(v).toLocaleString("en-US")
+
+}
+
+}
+
+function calc(){
+
+let thickness=number("thickness")
+
+let width=number("width")
+let length=number("length")
+
+let bundle=number("bundle")
+let pcsBundle=number("pcsBundle")
+
+let usd=number("usd")
+
+let exwpcs=number("exwpcs")
+let exwcbm=number("exwcbm")
+
+let logistics=number("logistics")
+
+let cfr=number("cfr")
+
+let pcs=bundle*pcsBundle
+
+let cbmPc=(thickness/1000)*(width/1000)*(length/1000)
+
+let cbmBuy=pcs*cbmPc
+
+let cbmSell=pcs*cbmPc
+
+let cbmDiff=cbmSell-cbmBuy
+
+let exwTotal=0
+
+if(exwpcs>0){
+
+exwTotal=pcs*exwpcs
+
+}
+
+else if(exwcbm>0){
+
+exwTotal=cbmBuy*exwcbm
+
+}
+
+let totalCfr=exwTotal+logistics
+
+let selling=cbmSell*cfr*usd
+
+let profit=Math.round(selling-totalCfr)
+
+document.getElementById("pcs").innerText=format(pcs)
+
+document.getElementById("buy").innerText=format(cbmBuy)
+
+document.getElementById("sell").innerText=format(cbmSell)
+
+document.getElementById("diff").innerText=format(cbmDiff)
+
+let p=document.getElementById("profit")
+
+p.innerText=format(profit)
+
+p.className=profit>=0?"blue":"red"
+
+}
+
+if("serviceWorker" in navigator){
+
+navigator.serviceWorker.register("service-worker.js")
+
+}
+
+</script>
+
+</body>
+
+</html>
